@@ -1,0 +1,45 @@
+name: Deploy AWS CDK Stack to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write # Required for AWS OIDC authentication
+  contents: read  # Required for actions/checkout
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::390403867048:role/GitHub_Actions_Role_CDK
+          aws-region: eu-north-1
+
+      - name: Install AWS CDK globally
+        run: npm install -g aws-cdk
+
+      - name: Build TypeScript code (CDK app and potentially Lambda if not using NodejsFunction bundling)
+        run: npm run build
+
+      - name: Synthesize CDK stack
+        run: cdk synth
+
+      - name: Deploy CDK stack
+        run: cdk deploy --all --require-approval never

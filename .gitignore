@@ -1,0 +1,78 @@
+# Node.js & npm/yarn
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+pids/
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json # Diagnostic reports
+
+# TypeScript
+*.tsbuildinfo
+# Compiled JavaScript files (compiling locally for non-Lambda assets)
+*.js
+*.js.map
+*.d.ts
+
+# AWS CDK specific
+cdk.out/
+.cdk.staging
+cdk.context.json
+
+# Lambda bundling artifacts (if not handled entirely within cdk.out)
+lambda/dist/
+lambda/build/
+lambda/node_modules/
+
+# Test & Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# IDE & Editor specific
+.vscode/
+.idea/
+*.swp
+
+# OS specific
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# dotenv environment variables file
+.env* # Ignore all .env files, including .env, .env.local, .env.production etc.
+!/.env.example # Optionally, commit an example .env file
+
+# Optional: If 'npm pack' is used
+*.tgz
+
+# Jest (if not covered by general JS rules)
+# !jest.config.js # Already allowed if *.js is too broad
+
+# Compiled Python files (if any Python scripts are used in tooling) [1]
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Other common temporary or build files
+dist/
+build/
+out/
+
+# Lerna debug log (if using Lerna monorepo)
+lerna-debug.log*
+
+# Serverless framework (if used alongside CDK for some reason)
+.serverless/
+
+# Parcel bundler cache
+.cache/
+
+# FuseBox cache
+.fusebox/
+
