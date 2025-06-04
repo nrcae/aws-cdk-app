@@ -45,9 +45,10 @@ export class MySimpleCdkStack extends cdk.Stack {
       requestTemplates: { 'application/json': '{ "statusCode": "200" }' },
     });
 
-    api.root.addResource('trigger').addMethod('GET', lambdaIntegration);
+    const trigger = api.root.addResource('trigger');
+    trigger.addMethod('GET', lambdaIntegration);
+    trigger.addMethod('POST', lambdaIntegration);
 
-    // Grant the Lambda function read/write permissions to the S3 bucket
     myBucket.grantReadWrite(myLambda);
 
     // Output the bucket name and Lambda function ARN for easy access

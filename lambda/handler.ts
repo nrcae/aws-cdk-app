@@ -7,11 +7,22 @@ export const handler = async (event: any, context: Context): Promise<any> => {
   const bucketName = process.env.BUCKET_NAME;
   console.log('Target S3 Bucket Name:', bucketName);
 
+  let inputData;
+  try {
+    inputData = event.body ? JSON.parse(event.body) : {};
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: 'Invalid JSON body' }),
+    };
+  }
+
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'Hello from Lambda!',
-      receivedEvent: event,
+      message: 'POST okay',
+      // receivedEvent: event,
+      input: inputData,
       bucketName: bucketName || 'Bucket name not set in environment variables.',
     }),
   };
