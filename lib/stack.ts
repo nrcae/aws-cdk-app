@@ -4,6 +4,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 
 export class MySimpleCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -35,6 +36,17 @@ export class MySimpleCdkStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
     });
 
+    const api = new apigateway.RestApi(this, 'MySimpleApiGateway', {
+      restApiName: 'MySimpleService',
+      description: 'A simple API Gateway that triggers Lambda',
+    });
+
+    const lambdaIntegration = new apigateway.LambdaIntegration(myLambda, {
+      requestTemplates: { 'application/json': '{ "statusCode": "200" }' },
+    });
+
+    api.root.addResource('trigger').addMethod('GET', lambdaIntegration);
+
     // Grant the Lambda function read/write permissions to the S3 bucket
     myBucket.grantReadWrite(myLambda);
 
@@ -43,9 +55,15 @@ export class MySimpleCdkStack extends cdk.Stack {
       value: myBucket.bucketName,
       description: 'Name of the S3 bucket',
     });
+
     new cdk.CfnOutput(this, 'LambdaFunctionArnOutput', {
       value: myLambda.functionArn,
       description: 'ARN of the Lambda function',
+    });
+
+    new cdk.CfnOutput(this, 'ApiUrlOutput', {
+      value: api.url,
+      description: 'API Gateway base URL',
     });
   }
 }
