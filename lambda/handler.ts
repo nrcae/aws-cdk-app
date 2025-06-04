@@ -5,7 +5,16 @@ export const handler = async (event: any, context: Context): Promise<any> => {
   console.log('Context ID:', context.awsRequestId);
   
   const bucketName = process.env.BUCKET_NAME;
-  console.log('Target S3 Bucket Name:', bucketName);
+  const log = {
+    requestId: context.awsRequestId,
+    time: new Date().toISOString(),
+    httpMethod: event.httpMethod,
+    path: event.path,
+    body: event.body,
+    bucketName,
+  };
+
+  console.log("INCOMING_EVENT_LOG", JSON.stringify(log));
 
   let inputData;
   try {
