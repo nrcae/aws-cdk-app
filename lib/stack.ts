@@ -14,8 +14,8 @@ export class MySimpleCdkStack extends cdk.Stack {
     // Create an S3 bucket
     const myBucket = new s3.Bucket(this, 'MySimplePipelineBucket', {
       versioned: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // Automatically delete bucket when stack is deleted (for dev/test)
-      autoDeleteObjects: true, // Automatically delete objects in bucket when stack is deleted (for dev/test)
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
@@ -71,20 +71,19 @@ export class MySimpleCdkStack extends cdk.Stack {
 
     myBucket.grantReadWrite(myLambda);
 
-    // Output the bucket name and Lambda function ARN for easy access
-    new cdk.CfnOutput(this, 'BucketNameOutput', {
-      value: myBucket.bucketName,
-      description: 'Name of the S3 bucket',
+    new cdk.CfnOutput(this, 'LambdaFunctionNameOutput', {
+      value: myLambda.functionName,
+      description: 'Name of the Lambda function',
     });
 
-    new cdk.CfnOutput(this, 'LambdaFunctionArnOutput', {
-      value: myLambda.functionArn,
-      description: 'ARN of the Lambda function',
+    new cdk.CfnOutput(this, 'ApiGatewayIdOutput', {
+        value: api.restApiId,
+        description: 'ID of the API Gateway REST API',
     });
 
-    new cdk.CfnOutput(this, 'ApiUrlOutput', {
-      value: api.url,
-      description: 'API Gateway base URL',
+    new cdk.CfnOutput(this, 'ApiTriggerEndpointOutput', {
+        value: `${api.url}trigger`,
+        description: 'Full URL for the /trigger endpoint',
     });
   }
 }
