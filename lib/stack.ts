@@ -5,6 +5,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
+import * as logs from 'aws-cdk-lib/aws-logs'
 
 export class MySimpleCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -34,11 +35,18 @@ export class MySimpleCdkStack extends cdk.Stack {
         externalModules: ['aws-sdk'],
       },
       timeout: cdk.Duration.seconds(10),
+      logRetention: logs.RetentionDays.ONE_WEEK,
     });
 
     const api = new apigateway.RestApi(this, 'MySimpleApiGateway', {
       restApiName: 'MySimpleService',
       description: 'A simple API Gateway that triggers Lambda',
+      deployOptions: {
+        stageName: 'prod',
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+        metricsEnabled: true,
+      }
     });
 
     const lambdaIntegration = new apigateway.LambdaIntegration(myLambda, {
