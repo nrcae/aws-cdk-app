@@ -6,6 +6,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 import * as logs from 'aws-cdk-lib/aws-logs'
+import * as sns from 'aws-cdk-lib/aws-sns'
 
 export class MySimpleCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,6 +21,11 @@ export class MySimpleCdkStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
+    const mySnsTopic = new sns.Topic(this, 'MyNotificationTopic', {
+      displayName: 'My application event notifications',
+      topicName: 'my-app-events-topic'
+    });
+
     // Create a Lambda function from the handler.ts file
     const myLambda = new NodejsFunction(this, 'MySimplePipelineFunction', {
       runtime: lambda.Runtime.NODEJS_20_X,
@@ -28,6 +34,7 @@ export class MySimpleCdkStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambda/handler.ts'),
       environment: {
         BUCKET_NAME: myBucket.bucketName,
+        SNS_TOPIC_ARN: mySnsTopic.topicArn,
       },
       bundling: {
         minify: true,
@@ -37,6 +44,8 @@ export class MySimpleCdkStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
       logRetention: logs.RetentionDays.ONE_WEEK,
     });
+
+    mySnsTopic.grantPublish(myLambda);
 
     const api = new apigateway.RestApi(this, 'MySimpleApiGateway', {
       restApiName: 'MySimpleService',
@@ -84,6 +93,11 @@ export class MySimpleCdkStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'ApiTriggerEndpointOutput', {
         value: `${api.url}trigger`,
         description: 'Full URL for the /trigger endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'SnsTopicArnOutput', {
+      value: mySnsTopic.topicArn,
+      description: 'ARN of the SNS topic for notifications',
     });
   }
 }
